@@ -1,19 +1,17 @@
 #!/bin/bash
-# Create ,replace and rename the file to vlsi_expert_
 
-function ex2b_14_soln() {
-	if [ -d "/home/rsahani/mywork" ] ; then
-		echo " ------New file in this directory ------"
-		touch file{1..5}.txt 
-		rename -v 's/.txt/.sh/' *.txt     #create file.txt and afterrename as file.sh
-		ls -l file*.txt
-	elif [ -f "file*.sh" ] ; then 
-		echo " ------Replaced prifix is here-------"
-		sed -i 's/file/vlsi_expert_/g' file*.sh          # replace the prifix of file*.sh to vlsi_expert_*.sh
+# to get unlimited no of argument as a vlsi_expert_name
+
+#function ex2b_7() {
+	 export vlsi_expert_name="$@"
+	if [ -f "$vlsi_expert_name" ]
+	then
+		echo " $vlsi_expert_name vlsi_expert_ is exist and regular vlsi_expert_"
 	else
-		echo "ERROR (ex2b_14): file*.txt are not present in this directory."
+		echo "$vlsi_expert_name vlsi_expert_ not found"
 	fi
-}
 
-ex2b_14_soln
+
+#}
+#ex2b_7
 

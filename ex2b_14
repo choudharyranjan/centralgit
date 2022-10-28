@@ -1,0 +1,50 @@
+#!/bin/bash
+
+function ex2b_14_soln() {
+	echo "******** Runing ex2b_14_ *******"
+if [[ -d "script" ]]
+then
+        echo "--------- New file in this directory -------- "
+        touch script/file{1..10}.txt       # create the ten file with extention .txt in this script
+	ls -la script/file*
+else
+        echo "ERROR (ex2b_14): ($file*.txt) No such file in this directory"
+        return
+fi
+1_exc1
+2_exc2
+
+}
+
+
+function 1_exc1(){
+
+    # Rename the file.txt to file.sh extention
+        echo " --------file*.txt is renamed as file*.sh --------"
+      rename 's/.txt/.sh/' script/*.txt
+	ls -l script/file*.sh
+
+
+}
+
+
+function 2_exc2(){
+
+    # Replace the prifix of file.sh to the vlsi_expert_.sh
+        echo "--------Replaced prifix is here--------"
+
+	mv file*.sh vlsi_expert_*.sh
+
+        ls -la script/*
+
+
+
+if [ -f "file*.txt" ] ; then
+	cd script
+        rm script/fil*.txt
+
+fi
+
+}
+
+ex2b_14_soln
