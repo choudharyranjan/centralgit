@@ -1,0 +1,213 @@
+#!/bin/bash
+
+# To monitor the disk space of user home directory on the basis of user
+ALERT='90%' #alert level 90 % of 2GB space 
+#ADMIN="itsupport@vlsiexpert.in" # sysadmin email ID
+MAX=2048
+
+
+machines="s1.el.vlsiexpert.in:/home /ve/tmhome
+s0.el.vlsiexpert.in:/ve/home /ve/rs
+"
+
+for macrec in $machines
+do
+	echo "Processing $macrec"
+	machine=`echo $macrec | sed -e 's#:.*$##g'
+	folders=`echo $machrec | sed -e 's#^.*:##g'`
+	echo "Machine $machine"
+	echo "Folders $folders"
+done
+exit 0
+
+
+############# s1.el.vlsiexpert.in #################
+USER1=$(ssh -X s1.el.vlsiexpert.in sudo ls -1 /home/)
+USER2=$(ssh -X s1.el.vlsiexpert.in sudo ls -1 /ve/tmhome/ | grep -vE 'aquota.group|aquota.user|lost|misc|vncuser')
+
+############## corp001s1.el.vlsiexpert.in ##########
+USER3=$(ssh -X corp001s1.el.vlsiexpert.in sudo ls -1 /ve/c001home/ | grep -vE '^khe|punee|ravir|test|cent|mis')
+
+############### s0.el.vlsiexpert.in ######################
+USER4=$(ssh s0.el.vlsiexpert.in sudo ls -1 /ve/home/ | grep -vE '^centos|puneet|ravirc|khelen')
+USER5=$(ssh s0.el.vlsiexpert.in sudo ls -1 /ve/rs)
+
+################# trg-setups-1.trg.vlsiexpert.in ###############
+USER6=$(ssh trg-setups-1.trg.vlsiexpert.in sudo ls -1 /home/)
+
+###############  co-server-001.trg.vlsiexpert.in ##########################
+USER7=$(ssh co-server-001.trg.vlsiexpert.in sudo ls -1 /home/)
+# Our partition of users uses on host s1.el.vlsiexpert.in
+#"/home/*" for internal batch 
+#"/ve/tmhome/*" for tech-mahindra corporate
+
+
+########################################################################
+	echo "-------------------Currently Disk usage in S1 and /home---------------"
+	echo
+for USER in $USER1 
+do 
+	# Get the disk uses of current user
+	USAGE=$(ssh s1.el.vlsiexpert.in sudo du -sm /home/$USER | awk '{print $1}')
+	
+    	# Calculate the percentage of disk usage
+    	PERCENT=`echo "scale=2; $USAGE / $MAX * 100" | bc`
+
+    	# Check if the disk usage is above the threshold
+	if [ "$PERCENT" > "$ALERT" ]
+	then
+	
+		echo "------------$USER==>$USAGE(MB)==>$PERCENT%----------------"
+		sleep 1
+		
+        # Alert the user that their disk space usage is high
+        #	echo "Warning: Your disk space usage is at $PERCENT%." | mail -s "Disk space usage warning" $USER
+   	fi 
+
+done
+###########################################################################
+	echo
+	echo "--------------------Currently Disk usage in /ve/tmhome---------------------"
+
+for USER in $USER2
+do
+        # Get the disk uses of current user
+        USAGE=$(ssh s1.el.vlsiexpert.in sudo du -sm /ve/tmhome/$USER | awk '{print $1}')
+	
+
+        # Calculate the percentage of disk usage
+        PERCENT=`echo "scale=2; $USAGE / $MAX * 100" | bc`
+
+        # Check if the disk usage is above the threshold
+        if [ "$PERCENT" > "$ALERT" ]
+        then
+               # echo "----script Executed succucessfully ---"
+                sleep 1
+		echo "--------------$USER==>$USAGE(MB)==>$PERCENT%---------"
+
+        # Alert the user that their disk space usage is high
+        #       echo "Warning: Your disk space usage is at $PERCENT%." | mail -s "Disk space usage warning" $USER
+        fi
+
+done
+#############################################################################
+	echo 
+	echo "--------------------- Currently disk usages on corp001 --------"
+for USER in $USER3
+do 
+        # Get the disk uses of current user
+        USAGE=$(ssh corp001s1.el.vlsiexpert.in sudo du -sm /ve/c001home/$USER | awk '{print $1}')
+        
+        # Calculate the percentage of disk usage
+        PERCENT=`echo "scale=2; $USAGE / $MAX * 100" | bc`
+
+        # Check if the disk usage is above the threshold
+       # if [ "$PERCENT" > "$ALERT" ]
+        #then
+
+	echo "------------------------$USER==>$USAGE(MB)==>$PERCENT%------------"
+                sleep 1
+
+        # Alert the user that their disk space usage is high
+        #       echo "Warning: Your disk space usage is at $PERCENT%." | mail -s "Disk space usage warning" $USER
+        #fi
+
+done
+
+#################################################################################
+        echo
+              echo "--------------------Currently Disk usage in s0 and /ve/home---------------"
+for USER in $USER4
+do
+        # Get the disk uses of current user
+        USAGE=$(ssh s0.el.vlsiexpert.in sudo du -sm /ve/home/$USER | awk '{print $1}')
+
+        # Calculate the percentage of disk usage
+        PERCENT=`echo "scale=2; $USAGE / $MAX * 100" | bc`
+
+        # Check if the disk usage is above the threshold
+        if [ "$PERCENT" > "$ALERT" ]
+        then
+
+                echo "-------------------$USER==>$USAGE(MB)==>$PERCENT%----------------"
+                sleep 1
+
+        # Alert the user that their disk space usage is high
+        #       echo "Warning: Your disk space usage is at $PERCENT%." | mail -s "Disk space usage warning" $USER
+        fi
+
+done
+
+######################################################################################
+        echo
+               echo "------------------Currently Disk usage in s0 and /ve/rs---------------"
+for USER in $USER5
+do
+        # Get the disk uses of current user
+        USAGE=$(ssh s0.el.vlsiexpert.in sudo du -sm /ve/rs/$USER | awk '{print $1}')
+
+        # Calculate the percentage of disk usage
+        PERCENT=`echo "scale=2; $USAGE / $MAX * 100" | bc`
+
+        # Check if the disk usage is above the threshold
+        if [ "$PERCENT" > "$ALERT" ]
+        then
+
+                echo "-------------------$USER==>$USAGE(MB)==>$PERCENT%----------------"
+                sleep 1
+
+        # Alert the user that their disk space usage is high
+        #       echo "Warning: Your disk space usage is at $PERCENT%." | mail -s "Disk space usage warning" $USER
+        fi
+
+done
+
+########################################################################################
+
+        echo
+               echo "------------------Currently Disk usage intrg-setups-1.trg.vlsiexpert.in and /home---------------"
+for USER in $USER6
+do
+        # Get the disk uses of current user
+        USAGE=$(ssh trg-setups-1.trg.vlsiexpert.in sudo du -sm /home/$USER | awk '{print $1}')
+
+        # Calculate the percentage of disk usage
+        PERCENT=`echo "scale=2; $USAGE / $MAX * 100" | bc`
+
+        # Check if the disk usage is above the threshold
+        if [ "$PERCENT" > "$ALERT" ]
+        then
+
+                echo "-------------------$USER==>$USAGE(MB)==>$PERCENT%----------------"
+                sleep 1
+
+        # Alert the user that their disk space usage is high
+        #       echo "Warning: Your disk space usage is at $PERCENT%." | mail -s "Disk space usage warning" $USER
+        fi
+
+done
+########################################################################################
+        echo
+               echo "------------------Currently Disk usage in co-server-001.trg.vlsiexpert.in /home---------------"
+for USER in $USER7
+do
+        # Get the disk uses of current user
+        USAGE=$(ssh co-server-001.trg.vlsiexpert.in sudo du -sm /home/$USER | awk '{print $1}')
+
+        # Calculate the percentage of disk usage
+        PERCENT=`echo "scale=2; $USAGE / $MAX * 100" | bc`
+
+        # Check if the disk usage is above the threshold
+        if [ "$PERCENT" > "$ALERT" ]
+        then
+
+                echo "-------------------$USER==>$USAGE(MB)==>$PERCENT%----------------"
+                sleep 1
+
+        # Alert the user that their disk space usage is high
+        #       echo "Warning: Your disk space usage is at $PERCENT%." | mail -s "Disk space usage warning" $USER
+        fi
+
+done
+
+
