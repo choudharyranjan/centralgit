@@ -24,5 +24,6 @@ do
     echo "Running out of space \"$partition ($usep%)\" on $m as on $(date)" |
     mail -s "Alert: Almost out of disk space $usep%" "$ADMIN"
   fi
+  
 done
 done
